@@ -10,6 +10,7 @@ import javax.persistence.TemporalType;
 import java.util.Date;
 
 import org.hibernate.annotations.GenericGenerator;
+import org.springframework.format.annotation.DateTimeFormat;
 
 @Entity
 @Table(name = "prestamos")
@@ -20,6 +21,7 @@ public class Prestamo {
     private String id;
 
     @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date fechaPrestamo;
 
     @Temporal(TemporalType.DATE)
