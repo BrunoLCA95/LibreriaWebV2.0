@@ -2,6 +2,7 @@ package com.example.demo.controller;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
+import java.util.Date;
 
 import com.example.demo.entity.Prestamo;
 import com.example.demo.service.ClienteService;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/prestamos")
@@ -38,6 +40,8 @@ public class PrestamoController {
     public String showSave(@PathVariable("id") String id, Model model){
         model.addAttribute("listaLibros", libroService.getAll());
         model.addAttribute("listaClientes", clienteService.getAll());
+
+
 
         
         char [] num_id = id.toCharArray();
@@ -78,9 +82,15 @@ public class PrestamoController {
         } else {
             prestamo.setFechaPrestamo(prestamoService.obtenerFecha());
             if (prestamoService.validarFecha(prestamo.getFechaDevolucion())) {
-                prestamoService.save(prestamo);
-                model.put("exito", "Prestamo guardado");
-                return "prestamo-from";    
+                if (prestamoService.validarStockLibro(prestamo)) {
+                    prestamoService.save(prestamo);
+                    model.put("exito", "Prestamo guardado");
+                    return "prestamo-from"; 
+                } else {
+                    model.put("error", "No quedan ejemplares de este libro");
+                    return "prestamo-from";
+                }
+                   
             }else{
                 model.put("error", "Error la fecha de devolucion es menor o igual a la fecha de emision");
                 return "prestamo-from";

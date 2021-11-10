@@ -9,4 +9,5 @@ public interface PrestamoService extends GenericService<Prestamo, String>{
     Boolean validarId(Prestamo prestamo);
     Date obtenerFecha();
     Boolean validarFecha(Date fecha);
+    Boolean validarStockLibro(Prestamo prestamo);
 }

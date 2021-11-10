@@ -36,15 +36,22 @@ public class PrestamoServiceImpl extends GenericServiceImpl<Prestamo, String> im
 
     @Override
     public Date obtenerFecha() {
-        SimpleDateFormat fechaI = new SimpleDateFormat("dd/MM/YYYY");    
-        String fechaFormateada = fechaI.format(new Date());
-        Date fechaFinal = null;
+        
+        Date fechaActual = new Date();
+        SimpleDateFormat fechaFormateada = new SimpleDateFormat("dd/MM/yyyy");
+        String fechaTexto = fechaFormateada.format(fechaActual);
+        
+        Date fechaActualFormateada = null;
+        
+        
         try {
-            fechaFinal = fechaI.parse(fechaFormateada);
-        } catch (Exception e) {
-
+            fechaActualFormateada = fechaFormateada.parse(fechaTexto);
+        } catch (Exception ex) {
+            
         }
-        return fechaFinal;
+
+        return fechaActualFormateada;
+
     }
 
     @Override
@@ -55,5 +62,18 @@ public class PrestamoServiceImpl extends GenericServiceImpl<Prestamo, String> im
         }
         return false;
     }
+
+    @Override
+    public Boolean validarStockLibro(Prestamo prestamo) {
+        Integer stock = prestamo.getLibro().getEjemplaresRestantes()-1;
+        
+        if (stock <= 0) {
+            return false;
+        } else {
+         return true;   
+        }
+    }
+
+    
     
 }

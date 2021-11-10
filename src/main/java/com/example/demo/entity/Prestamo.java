@@ -25,6 +25,7 @@ public class Prestamo {
     private Date fechaPrestamo;
 
     @Temporal(TemporalType.DATE)
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
     private Date fechaDevolucion;
 
     private String alta;
