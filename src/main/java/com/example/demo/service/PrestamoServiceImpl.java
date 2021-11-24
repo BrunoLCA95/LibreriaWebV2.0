@@ -65,12 +65,12 @@ public class PrestamoServiceImpl extends GenericServiceImpl<Prestamo, String> im
 
     @Override
     public Boolean validarStockLibro(Prestamo prestamo) {
-        Integer stock = prestamo.getLibro().getEjemplaresRestantes()-1;
+        Integer stock = prestamo.getLibro().getEjemplaresRestantes();
         
-        if (stock <= 0) {
-            return false;
+        if (stock >= 1) {
+            return true;
         } else {
-         return true;   
+         return false;   
         }
     }
 

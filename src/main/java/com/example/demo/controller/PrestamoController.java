@@ -1,9 +1,5 @@
 package com.example.demo.controller;
 
-import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
-import java.util.Date;
-
 import com.example.demo.entity.Prestamo;
 import com.example.demo.service.ClienteService;
 import com.example.demo.service.LibroService;
@@ -17,7 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+
 
 @Controller
 @RequestMapping("/prestamos")
@@ -32,7 +28,16 @@ public class PrestamoController {
 
     @RequestMapping("/")
 	public String index(Model model) {
-		model.addAttribute("list", prestamoService.getAll());
+		for (Prestamo prestamo2 : prestamoService.getAll()) {
+            if( prestamo2.getFechaDevolucion().after(prestamoService.obtenerFecha()) ){
+                prestamo2.setAlta("false");
+            }
+            prestamoService.save(prestamo2);
+        }
+
+        model.addAttribute("list", prestamoService.getAll());
+
+
 		return "prestamos";
 	}
 
@@ -42,8 +47,6 @@ public class PrestamoController {
         model.addAttribute("listaClientes", clienteService.getAll());
 
 
-
-        
         char [] num_id = id.toCharArray();
 		String id_num = "";
 		for (int i = 0; i < 8; i++) {
@@ -83,14 +86,16 @@ public class PrestamoController {
             prestamo.setFechaPrestamo(prestamoService.obtenerFecha());
             if (prestamoService.validarFecha(prestamo.getFechaDevolucion())) {
                 if (prestamoService.validarStockLibro(prestamo)) {
+                    prestamo.getLibro().setEjemplaresPrestados(prestamo.getLibro().getEjemplaresPrestados()+1);
+                    prestamo.getLibro().setEjemplaresRestantes(prestamo.getLibro().getEjemplaresRestantes()-1);
+                    libroService.save(prestamo.getLibro());
                     prestamoService.save(prestamo);
                     model.put("exito", "Prestamo guardado");
                     return "prestamo-from"; 
                 } else {
                     model.put("error", "No quedan ejemplares de este libro");
                     return "prestamo-from";
-                }
-                   
+                }   
             }else{
                 model.put("error", "Error la fecha de devolucion es menor o igual a la fecha de emision");
                 return "prestamo-from";
@@ -100,7 +105,10 @@ public class PrestamoController {
 
     @GetMapping("/prestamo-delete/{id}")
     public String delete (@PathVariable("id") String id, Model mole){
+        prestamoService.get(id).getLibro().setEjemplaresPrestados(prestamoService.get(id).getLibro().getEjemplaresPrestados()-1);
+        prestamoService.get(id).getLibro().setEjemplaresRestantes(prestamoService.get(id).getLibro().getEjemplaresRestantes()+1);
         prestamoService.delete(id);
+        
         return "redirect:/";
     }
 
